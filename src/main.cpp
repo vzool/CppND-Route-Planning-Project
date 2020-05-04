@@ -56,11 +56,31 @@ int main(int argc, const char **argv)
     // user input for these values using std::cin. Pass the user input to the
     // RoutePlanner object below in place of 10, 10, 90, 90.
 
+    float start_x = 0.0f, start_y = 0.0f, end_x = 0.0f, end_y = 0.0f;
+
+    std::cout << "==============================================\n";
+    std::cout << "Enter four floating numbers for two points places (start_x start_y end_x end_y) between [0-100] like this (10 10 90 90):\n";
+    std::cin >> start_x >> start_y >> end_x >> end_y;
+    std::cout << "----------------------------------------------\n";
+    std::cout << "Start point(" << start_x << "," << start_y << ") - "
+              << "End point(" << end_x << "," << end_y << ")\n";
+
+    if (start_x <   0.0f || start_y <   0.0f || end_x <   0.0f || end_y <   0.0f ||
+        start_x > 100.0f || start_y > 100.0f || end_x > 100.0f || end_y > 100.0f)
+    {
+        std::cout << "----------------------------------------------\n";
+        std::cout << "ERROR: Unacceptable Inputs provided! quit.\n";
+        std::cout << "==============================================\n";
+        return 1;
+    }
+
+    std::cout << "==============================================\n";
+
     // Build Model.
     RouteModel model{osm_data};
 
     // Create RoutePlanner object and perform A* search.
-    RoutePlanner route_planner{model, 10, 10, 90, 90};
+    RoutePlanner route_planner{model, start_x, start_y, end_x, end_y}; // 10, 10, 90, 90
     route_planner.AStarSearch();
 
     std::cout << "Distance: " << route_planner.GetDistance() << " meters. \n";
