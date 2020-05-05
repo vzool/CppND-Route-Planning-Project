@@ -40,8 +40,10 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 
     for (auto neighbor : current_node->neighbors)
     {
+        if (neighbor->visited) continue;
+
         neighbor->parent = current_node;
-        neighbor->g_value = current_node->distance(*neighbor);
+        neighbor->g_value = current_node->g_value + current_node->distance(*neighbor);
         neighbor->h_value = this->CalculateHValue(neighbor);
         neighbor->visited = true;
         this->open_list.push_back(neighbor);
@@ -107,39 +109,20 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 // - When the search has reached the end_node, use the ConstructFinalPath method to return the final path that was found.
 // - Store the final path in the m_Model.path attribute before the method exits. This path will then be displayed on the map tile.
 
-void RoutePlanner::AStarSearch() {
-
+void RoutePlanner::AStarSearch()
+{
     RouteModel::Node *current_node = this->start_node;
 
-    // TODO: Implement your solution here.
+    this->start_node->visited = true;
 
-    this->AddNeighbors(current_node);
+    this->open_list.push_back(this->start_node);
 
-    // std::cout << "Open List Size: " << this->open_list.size() << "\n";
-    // std::cout << "Start(" << start_node->x << ", " << start_node->y << ") - "
-    //           << "End(" << end_node->x << ", " << end_node->y << ") - "
-    //           << "Current(" << current_node->x << ", " << current_node->y << ")\n";
-
-    while (this->open_list.size() > 0)
+    while (current_node != this->end_node && !this->open_list.empty())
     {
-        current_node = this->NextNode();
-
-        std::cout << "Current(" << current_node->x << ", " << current_node->y << ") - "
-                  << "Distance(S-" << current_node->distance(*this->start_node) << ", E-" << current_node->distance(*this->end_node) << ")\n";
-
-        if(current_node->x == this->end_node->x && current_node->y == this->end_node->y) {
-
-            std::cout << "#####################################################\n";
-            std::cout << "################ END POINT REACHED ##################\n";
-            std::cout << "#####################################################\n";
-
-            this->m_Model.path = this->ConstructFinalPath(current_node);
-
-            std::cout << "###################### DONE #########################\n";
-
-            return;
-        }
-        
         this->AddNeighbors(current_node);
+
+        current_node = this->NextNode();
     }
+
+    this->m_Model.path = this->ConstructFinalPath(current_node);
 }
